@@ -26,6 +26,8 @@ Scrimn Bot
      └── checkin (`Open`)
      └── checkin_mix (`Open`)
      └── checkout (`Open`)
+     └── tier (`Open`)
+     └── get (`Open`)
 ```
 
 **`note`** rename .env.example to .env<br />
