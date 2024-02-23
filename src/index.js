@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, IntentsBitField} = require('discord.js');
 const commandFiles = require('./utils/commandParser');
 const { tempMsg } = require('./utils/helper');
+const { terminate, loggerv1 } = require('./utils/logger');
 
 const client = new Client({
     intents: [
@@ -54,5 +55,13 @@ client.on('messageCreate',(msg) => {
     //   .catch(console.error);;
     // msg.channel.send('Hello Jiii');
     console.log(commandFiles);
-})
+});
+const exitHandler = terminate({
+    coredump: false,
+    timeout: 500
+});
 client.login(process.env.BOT_TOKEN);
+process.on('uncaughtException', exitHandler(1, 'Unexpected Error'))
+process.on('unhandledRejection', exitHandler(1, 'Unhandled Promise'))
+process.on('SIGTERM', exitHandler(0, 'SIGTERM'))
+process.on('SIGINT', exitHandler(0, 'SIGINT'))
