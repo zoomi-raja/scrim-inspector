@@ -1,0 +1,12 @@
+.git
+.idea
+.DS_Store
+node_modules
+node_modules/
+**/node_modules
+build
+.dockerignore
+**/.git
+**/.DS_Store
+**/mysql
+node_modules/
