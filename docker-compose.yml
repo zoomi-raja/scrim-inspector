@@ -1,0 +1,59 @@
+version: "3"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELK_PASSWORD}
+      - xpack.security.enabled=true
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.15.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELK_PASSWORD}
+    depends_on:
+      - elasticsearch
+  filebeat:
+    build:
+      context: ./filebeat
+    container_name: filebeat
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./logs:/logs
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - elasticsearch
+      - kibana
+  redis_srv:
+    restart: always
+    image: redis:6.2
+    container_name: redis_loc
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_PASSWORD= ${REDIS_PASS}
+    volumes:
+      - redis:/data
+  mysql_srv:
+    restart: always
+    image: mysql:8.0
+    container_name: mysql_loc
+    ports:
+      -  ${DB_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - ./mysql/dcbot:/var/lib/mysql
+volumes:
+  redis:
