@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://cdn.discordapp.com/app-icons/1200458919856853002/e3afa6f1d9fc61fb7eff5533c2f2baac.png" width="120" />
+</p>
+
 # Discord PUBG Scrim Bot
 
 A Discord bot to manage PUBG scrim matches, teams, check-ins, lootspot lobbies, and staff workflows.
