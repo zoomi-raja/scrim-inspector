@@ -1,124 +1,225 @@
 # Discord PUBG Scrim Bot
-This bot helps to make managing PUBG scrim easy. It provides utils for both Players and Server owner. Each command is either.
-- Open
-- Private
 
-To utilize private command person should have staff role. Any one on server can use open commands.
+A Discord bot to manage PUBG scrim matches, teams, check-ins, lootspot lobbies, and staff workflows.
 
-**Commands**
-```
-Scrimn Bot
-│── scrims
-│    └── init (`Only for server owner`)
-|    └── scrim_edit (`Private`)
-│    └── scrim (`Private`)
-│       │── Open
-│       │── Close
-│       │── Reset
-│       └── Announce
-└── lootspots
-│    └── ls_create (`Private`)
-|    └── ls_active (`Private`)
-│    └── ls_lock (`Private`)
-└── teams
-     └── add (`Private`)
-     └── list (`Open`)
-     └── checkin (`Open`)
-     └── checkin_mix (`Open`)
-     └── checkout (`Open`)
-     └── tier (`Open`)
-     └── get (`Open`)
-```
+This bot is built for server owners, staff, and players. It creates the required channels and roles, then lets registered teams and mix teams participate in a PUBG-style scrim flow.
 
-**`note`** rename .env.example to .env<br />
+## What it does
 
-`following are the required environment variable`
+- Manages PUBG scrim match setup and team check-ins
+- Creates channels and roles automatically with `/init`
+- Supports private staff commands and public player commands
+- Generates lobby-based lootspot selection channels
+- Handles team check-in, checkout, voice channel creation, and matchmaking priority
 
-```
-BOT_TOKEN = ******
-SERVER_ID = ******
-BOT_USER_ID = ******
-DB_HOST = localhost
-DB_NAME = dcbot
-DB_PASS = 12345
-DB_USER = root
-DEFAULT_BOT_ICON = https://cdn.discordapp.com/attachments/1076881825030471721/1162883445337362472/KDJQo3k.png
-```
-To **`Register`** commands with discord server run
+## Command types
 
-```
- node .\src\commands\register-command.js
-```
-To **`Run`** Bot
+There are two command groups:
+
+- **Public (Open)**: for all server members
+- **Private**: for staff members only
+
+To start, the server owner must run `/init`. This command creates the required channels and roles, and configures the bot for the server.
+
+After initialization, all private commands must be used inside the `📑│bot-commands` channel.
+
+## Setup and install
+
+### Requirements
+
+- `node` and `npm` installed on your machine
+- MySQL and Redis for backend storage
+- Discord bot token and permissions for channel/role management
+
+### Recommended setup
+
+- Use Docker for MySQL and Redis if you want an isolated local environment
+- Install Node.js and npm directly on the host, then run the bot from source
+
+### Install and run
+
 ```bash
 git clone https://github.com/zoomi-raja/discord-scrim-bot.git
-yarn install
-yarn start
+cd discord-scrim-bot
+npm install
+npm start
 ```
 
-## Intro to Commands
-To initilize Bot for the first time use following command. There is two type of locks one is to lock checkin/checkout and one is to lock lobby lootspots.
+### Register commands with Discord
+
+```bash
+node src/commands/register-command.js
+```
+
+## Environment variables
+
+Rename `.env.example` to `.env` and populate the values.
+
+Required variables:
+
+```env
+BOT_TOKEN=******
+SERVER_ID=******
+BOT_USER_ID=******
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=dcbot
+DB_PASS=12345
+DB_USER=root
+REDIS_HOST=localhost
+REDIS_PORT=6379
+DEFAULT_BOT_ICON=https://cdn.discordapp.com/attachments/1076881825030471721/1162883445337362472/KDJQo3k.png
+```
+
+## How clean uninstall works
+
+The bot stores initialization metadata in the database and creates a root category for the scrim.
+If you need to remove everything created by `/init`, delete the root category that was generated with the scrim name.
+
+For example, if the scrim name was `mea scrims`, delete the category named `mea scrims` in Discord. The bot will then remove the related channels and roles created for that scrim and perform a clean uninstall of that configuration.
+
+## Folder structure
+
+```
+src/
+  index.js
+  commands/
+    help.js
+    register-command.js
+    lootspots/
+    scrims/
+    teams/
+  db/
+    mysql.js
+    redis.js
+    models/
+  utils/
+    alerts.js
+    commandParser.js
+    helper.js
+    logger.js
+    tempCache.js
+scr/
+  vikandi/
+admin/
+  backend/
+  frontend/
+```
+
+## Command overview
+
+To initialize the bot for the first time, run:
+
+- `/init` — only the server owner can run this command
+
+This creates the required channels and roles, including:
+
+- `📑│bot-commands`
+- `✅│check-in`
+- `❌│check-out`
+- `📢│final-lobby`
+- `📢│lobby-status`
+- `voice channels` category
+- `Staff`, `Team Captain`, `Mix Approved`, and tier roles
+
+### Scrim commands
+
+- `/scrim` — open, close, reset, announce
+- `/scrim_edit` — change min/max teams and scrim mode
+
+### Lootspot commands
+
+- `/ls_create` — create lobby category and selection channels
+- `/ls_active` — send lootspot selection options to channels
+- `/ls_lock` — lock/unlock lootspots in a lobby
+
+### Team commands
+
+- `/add` — register a team, create role, assign players
+- `/list` — list registered teams
+- `/player` — search for team by player
+- `/team` — search for a team
+- `/checkin` — registered teams check in
+- `/checkin_mix` — mix teams check in with `Mix Approved` role
+- `/checkout` — checkout a team and release their lootspot
+
+## Intro to commands
+
+To initialize the bot for the first time, use `/init`. This command creates mandatory channels and roles and sets up the server for scrim operations.
 
 ![picture](/scr/init.PNG)
 
-It will create mandatory channels and roles, And on success will return message for further actions.
+On success, the bot will create channels, roles, and instructions for next steps.
 
-![picture](/scr/role.PNG)![picture](/scr/channels.PNG)
+![picture](/scr/role.PNG) ![picture](/scr/channels.PNG)
 
-**`Note.!`** Staff can run private commands in `bot-command` channel<br />
+**Note:** private commands can only be run in the `📑│bot-commands` channel.
 
-**`scrim_edit`** command can be used to modify teams limit and scrim mode which was set during **`init`** command
+### Scrim modes
 
-`Scrim can have one of the following Mode`
-Based on priority teams will have slot in lobbies when scrim announced.
-- Team -> In team mode priority registered teams will have priority over Mix checked in team
-- Tier -> Team with higher tier will have periority then Mix checked in team. (Pro, Tier1, Tier2, Tier3, Tier4, Tier5, Team)
-- FSFC -> No priority whoever checkin in first will get the slot in lobby
+Based on the selected mode, teams are prioritized in lobby assignment:
 
-`CheckIn/Checkout Procedure`
+- **Team** — registered teams have priority over mix teams
+- **Tier** — teams with higher tier have priority (Pro, Tier1, Tier2, Tier3, Tier4, Tier5, Team)
+- **FCFS** — first come, first served
 
-Once scrim is open using command **`/scrim open`** teams can checkIn or checkedIn team can checkout to avoid palenty. On checkout team VC will be deleted and lootspot taken will be made available for other team to select.
-Mix Checkin is available using command **`checkin_mix`**, atleast three players required to check in as Mix team. All players need to have **`Mix Approved`** role and the person who will run command will became captain of that mix team. To checkout both Mix team and registered team can use **`/checkout`** command only difference is for mix team captain need to pass Mix Approved instead of Team name.
+### Check-in / Checkout process
+
+When the scrim is open with `/scrim open`, teams can check in and checkout. Checkout frees the lootspot and deletes the team voice channel.
+
+Mix check-in requires at least three players and the `Mix Approved` role. The player who runs `/checkin_mix` becomes the mix team captain.
 
 ![picture](/scr/checkin.PNG)
 
-On checkin team voice channel will be created where only team member of that team can join. In chat of that channel team captain can invite any two member of server to join the chat.
+When a team checks in, a voice channel is created for that team and only its members can join. The captain can invite two additional members into the team voice chat.
 
 ![picture](/scr/teamvc.PNG)
 
-**`Note.!`** to disable checkIn **`/scrim close`** can be used<br />
+**Note:** use `/scrim close` to disable check-in.
 
-`Lobby/Lootspt commands`
+### Lobby / lootspot commands
 
-**`ls_create, ls_active, ls_lock`** There can be multiple lobbies and each lobby will have its on lootspot selection channels.
+`/ls_create`, `/ls_active`, and `/ls_lock` support multiple lobbies. Each lobby gets its own lootspot selection channels.
 
-**`ls_create`** Will create Lobby and its required channels. to delete generated lobby you dont have to delete individual channels separately instead delete category on discord it will delete everything for that Lobby.
+`/ls_create` creates the lobby category and required channels. To delete a lobby, delete the lobby category in Discord — the bot will remove the related channels automatically.
+
 ![picture](/scr/lobby.PNG)
 
-**`ls_active`** Will send lootspot selection options for particular lobby selected in the response of the command.
+`/ls_active` sends lootspot selection options into the lobby channels.
 
 ![picture](/scr/lootspot.PNG)
 
-**`/ls_lock`** is to disable lootspots of any particular lobby temporarly.
+`/ls_lock` temporarily disables lootspot selection for a lobby.
 
 ![picture](/scr/taala.PNG)
 
+**Note:** if a team moves lobbies, staff can remove and reassign their lootspot to keep lobby assignments correct.
 
-**`Note.!`** As for scrims there is periority logic and due to which if team who has selected e.g Spot in lobby 1 and later moved to lobby 2 staff can remove its lootspot so same player can pick lootspot in correct lobby.
+## Dependencies
+
+- Node.js and npm
+- Discord.js
+- dotenv
+- mysql2
+- redis
+- winston
+- winston-daily-rotate-file
+
+If you want to use MySQL and Redis via Docker, run the provided Docker setup for backend services and install Node/npm on the host machine.
 
 ## FAQs
 
-Feel free to open an issue if there is something that we can improve. Would love to have your helping hand.
-Next open points.
-1- team with higher priority can take lootspot from Mix checked in team?
-2- Strike system?
+- Can a removed bot delete channels after being kicked?
+  - No. Once the bot is removed from the server, it cannot delete channels until it is re-added with proper permissions.
+- How do I pause work and resume later?
 
 ## Contributions
-- Report issues.
-- Open pull request with improvements
+
+- Report issues
+- Open pull requests with improvements
 - Spread the word
-- Reach out with any feedback [Zamurd Ali](https://twitter.com/zoomirajpoot)
+- Reach out with feedback: [Zamurd Ali](https://twitter.com/zoomirajpoot)
 
 ## License
 
-Have a look at the [license file](./license) for details
+See the [license file](./license) for details.
