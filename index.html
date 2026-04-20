@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inspector Bota - Discord PUBG Scrim Bot</title>
+    <link
+      rel="icon"
+      href="https://cdn.discordapp.com/app-icons/1200458919856853002/e3afa6f1d9fc61fb7eff5533c2f2baac.png"
+    />
+    <style>
+      :root {
+        --primary-bg: #1a1a1a; /* Dark background */
+        --secondary-bg: #2a2a2a; /* Slightly lighter */
+        --theme-color: #fbca80; /* Firefighter-inspired orange */
+        --accent: #ff4500; /* Red accent, inspired by firefighter theme */
+        --text: #ffffff; /* White text */
+        --text-secondary: #cccccc; /* Light gray */
+        --border: #444444;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--primary-bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      header {
+        background-color: var(--secondary-bg);
+        text-align: center;
+        padding: 2rem;
+        border-bottom: 2px solid var(--accent);
+      }
+      header img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+      }
+      h1,
+      h2,
+      h3 {
+        color: var(--accent);
+      }
+      section {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .intro {
+        text-align: center;
+      }
+      .commands,
+      .setup {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      .usage {
+        display: grid;
+        text-align: center;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        align-items: center;
+        justify-items: center;
+        overflow: hidden;
+      }
+      .usage > * {
+        min-width: 0;
+      }
+      .usage .item-1,
+      .usage .item-2,
+      .usage .item-5,
+      .usage .item-9 {
+        grid-column: 1 / -1;
+      }
+      .usage .item-6 {
+        grid-row: 5 / 7;
+        width: 60%;
+      }
+      .usage .item-10 {
+        width: 70%;
+      }
+
+      .command-group,
+      .setup-item {
+        flex: 1 1 300px;
+        background-color: var(--secondary-bg);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 0.5rem;
+      }
+      code {
+        background-color: var(--secondary-bg);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+      pre {
+        background-color: var(--secondary-bg);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+      img.screenshot {
+        display: block;
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+      .contact-form {
+        background-color: var(--secondary-bg);
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: 2rem auto;
+      }
+      .contact-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      .contact-form input,
+      .contact-form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background-color: var(--theme-color);
+        color: var(--primary-bg);
+      }
+      .contact-form button {
+        background-color: var(--accent);
+        color: var(--text);
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .contact-form button:hover {
+        background-color: #e63900;
+      }
+      footer {
+        text-align: center;
+        padding: 1rem;
+        background-color: var(--secondary-bg);
+        border-top: 2px solid var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img
+        src="https://cdn.discordapp.com/app-icons/1200458919856853002/e3afa6f1d9fc61fb7eff5533c2f2baac.png"
+        alt="Inspector Bota Icon"
+      />
+      <h1>Inspector Bota</h1>
+      <p>Discord PUBG Scrim Bot</p>
+    </header>
+
+    <section class="intro">
+      <h2>What is Inspector Bota?</h2>
+      <p>
+        A Discord bot to manage PUBG scrim matches, teams, check-ins, lootspot
+        lobbies, and staff workflows. Built for server owners, staff, and
+        players, it creates required channels and roles, then lets registered
+        teams and mix teams participate in a PUBG-style scrim flow.
+      </p>
+      <h3>What it does</h3>
+      <ul>
+        <li>Manages PUBG scrim match setup and team check-ins</li>
+        <li>
+          Creates channels and roles automatically with <code>/init</code>
+        </li>
+        <li>Supports private staff commands and public player commands</li>
+        <li>Generates lobby-based lootspot selection channels</li>
+        <li>
+          Handles team check-in, checkout, voice channel creation, and
+          matchmaking priority
+        </li>
+      </ul>
+    </section>
+
+    <section class="commands">
+      <div class="command-group">
+        <h2>Command Types</h2>
+        <p>There are two command groups:</p>
+        <ul>
+          <li><strong>Public (Open)</strong>: for all server members</li>
+          <li><strong>Private</strong>: for staff members only</li>
+        </ul>
+        <p>
+          To start, the server owner must run <code>/init</code>. This creates
+          required channels and roles. After initialization, private commands
+          must be used in the <code>📑│bot-commands</code> channel.
+        </p>
+      </div>
+      <div class="command-group">
+        <h2>Scrim Commands</h2>
+        <ul>
+          <li><code>/init</code> — Initialize the bot (server owner only)</li>
+          <li><code>/scrim</code> — Open, close, reset, announce scrim</li>
+          <li><code>/scrim_edit</code> — Change min/max teams and mode</li>
+        </ul>
+      </div>
+      <div class="command-group">
+        <h2>Lootspot Commands</h2>
+        <ul>
+          <li><code>/ls_create</code> — Create lobby category and channels</li>
+          <li><code>/ls_active</code> — Send lootspot options</li>
+          <li><code>/ls_lock</code> — Lock/unlock lootspots</li>
+        </ul>
+      </div>
+      <div class="command-group">
+        <h2>Team Commands</h2>
+        <ul>
+          <li><code>/add</code> — Register a team</li>
+          <li><code>/list</code> — List registered teams</li>
+          <li><code>/checkin</code> — Check in registered team</li>
+          <li><code>/checkin_mix</code> — Check in mix team</li>
+          <li><code>/checkout</code> — Checkout team</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="usage">
+      <h2 class="item-1">Usage Guide</h2>
+      <p class="item-2">
+        Once <code>/init</code>, is executed, the bot will create the required
+        roles, channels, including check-in, check-out, and bot-commands.
+      </p>
+      <img
+        src="../scr/init.PNG"
+        alt="Init Command Screenshot"
+        class="screenshot item-3"
+      />
+
+      <img
+        src="../scr/role.PNG"
+        alt="Roles Screenshot"
+        class="screenshot item-4"
+      />
+      <p class="item-5">
+        Staff can run private commands only in the bot-commands channel. When
+        teams use the <code>/checkin</code> command, voice channels are created
+        automatically. The team lead can also add temporary players to the
+        channel.
+      </p>
+      <img
+        src="../scr/channels.PNG"
+        alt="Channels Screenshot"
+        class="screenshot item-6"
+      />
+      <img
+        src="../scr/checkin.PNG"
+        alt="Checkin Screenshot"
+        class="screenshot item-7"
+      />
+      <img
+        src="../scr/teamvc.PNG"
+        alt="Team Voice Channel Screenshot"
+        class="screenshot item-8"
+      />
+      <p class="item-9">
+        A set of lobbies and loot spot options has been created with
+        <code>/ls_create</code>, allowing teams to make their selections.
+      </p>
+      <img
+        src="../scr/lobby.PNG"
+        alt="Lobby Screenshot"
+        class="screenshot item-10"
+      />
+      <img
+        src="../scr/lootspot.PNG"
+        alt="Lootspot Screenshot"
+        class="screenshot item-11"
+      />
+    </section>
+
+    <section class="contact-form">
+      <h2>Contact Us</h2>
+      <p>Have questions? Send us an email!</p>
+      <form
+        action="mailto:zoom_karyala@yahoo.com"
+        method="post"
+        enctype="text/plain"
+      >
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+
+        <button type="submit">Send Email</button>
+      </form>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Inspector Bota. Built for PUBG scrim management.</p>
+    </footer>
+  </body>
+</html>
