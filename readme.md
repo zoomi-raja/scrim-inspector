@@ -4,7 +4,7 @@
 
 # Discord PUBG Scrim Bot
 
-A Discord bot to manage PUBG scrim matches, teams, check-ins, lootspot lobbies, and staff workflows.
+A Discord bot to manage PUBG scrim matches, teams, check-ins, lootspot lobbies, and staff workflows. [Website](https://zoomi-raja.github.io/scrim-inspector/)
 
 This bot is built for server owners, staff, and players. It creates the required channels and roles, then lets registered teams and mix teams participate in a PUBG-style scrim flow.
 
